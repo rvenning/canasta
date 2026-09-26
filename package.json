@@ -1,0 +1,41 @@
+{
+  "name": "canasta",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Classic Canasta for two, three or four players — pass-and-play and three AI levels, offline-first.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 8138 --strictPort",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "sim": "node tools/simulate.ts",
+    "cards": "node tools/build-cards.ts",
+    "audio": "node tools/build-audio.ts",
+    "icons": "node tools/make-icons.ts",
+    "e2e": "node tests/e2e/e2e.cjs"
+  },
+  "devDependencies": {
+    "@types/howler": "^2.2.13",
+    "@types/node": "^22.20.4",
+    "@types/three": "^0.186.0",
+    "ffmpeg-static": "^5.3.0",
+    "sharp": "^0.35.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.6",
+    "vitest": "^3.2.7"
+  },
+  "dependencies": {
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "howler": "2.2",
+    "motion": "^12.43.0",
+    "three": "^0.186.1"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "sharp@0.35.4": true
+  }
+}

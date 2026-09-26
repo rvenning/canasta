@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#3a1a2e" />
+  <meta name="description" content="Classic Canasta for two, three or four players: pass and play, or play the computer at three levels. Works offline." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Canasta" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <title>Canasta</title>
+</head>
+<body>
+  <div id="app">
+    <noscript><p style="color:#fff;padding:16px">Canasta needs JavaScript to deal the cards.</p></noscript>
+  </div>
+  <div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <div id="live-assertive" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+  <div id="caption" class="caption" aria-hidden="true"></div>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="./src/main.ts"></script>
+</body>
+</html>

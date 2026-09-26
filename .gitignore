@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+tests/e2e/out/
+sim-report*.json
+sim-report.txt
+tools/scratch/
+canasta_spec.md
