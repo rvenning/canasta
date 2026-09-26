@@ -18,6 +18,8 @@ const opp = (process.argv[3] ?? 'standard') as AiLevel;
 const N = Number(process.argv[4] ?? 200);
 const ME: AiLevel = cand === opp ? 'expert' : cand;
 const THEM: AiLevel = cand === opp ? 'standard' : opp;
+/** Player counts to optimise over, e.g. MODES=3. */
+const MODES = (process.env.MODES ?? '2,4').split(',').map(Number) as (2 | 3 | 4)[];
 
 const GRID: Partial<Record<keyof Weights, number[]>> = {
   takeFactor: [0, 0.6, 1, 1.6, 2.5],
@@ -35,14 +37,14 @@ const GRID: Partial<Record<keyof Weights, number[]>> = {
 
 function score(w: Weights): number {
   let wins = 0, n = 0;
-  for (const p of [2, 4] as const) {
+  for (const p of MODES) {
     for (let seed = 1; seed <= N; seed++) {
       const swap = seed % 2 === 0;
-      const lv: AiLevel[] = p === 4 ? (swap ? [THEM, ME, THEM, ME] : [ME, THEM, ME, THEM]) : swap ? [THEM, ME] : [ME, THEM];
+      const lv: AiLevel[] = p === 4 ? (swap ? [THEM, ME, THEM, ME] : [ME, THEM, ME, THEM]) : p === 3 ? [[ME, THEM, THEM], [THEM, ME, THEM], [THEM, THEM, ME]][seed % 3] : swap ? [THEM, ME] : [ME, THEM];
       const r = simulateMatch(p, lv, 90000 + seed, 60, { [ME]: w, [THEM]: WEIGHTS[opp] });
       if (r.winner === null) continue;
       n++;
-      if (r.winner === (swap ? 1 : 0)) wins++;
+      if (p === 3 ? lv[r.winner] === ME : r.winner === (swap ? 1 : 0)) wins++;
     }
   }
   return wins / n;

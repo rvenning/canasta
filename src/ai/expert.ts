@@ -25,7 +25,7 @@ import type { AiMove } from './policy.ts';
 type Decide = (v: PublicView) => AiMove;
 
 /** worlds sampled per decision; horizon = turns played out before judging the position (0 = to the end of the hand). */
-export const EXPERT_BUDGET = { worlds: 24, maxCandidates: 7, rolloutSteps: 500, horizon: 8 };
+export const EXPERT_BUDGET = { worlds: 24, maxCandidates: 7, rolloutSteps: 500, horizon: 8, start: true, discard: true, modes: [2, 3] as number[] };
 
 /** Cards an opponent is known to hold: picked up with a pile and not melded or discarded since. */
 export function knownHands(v: PublicView): CardId[][] {
@@ -164,7 +164,7 @@ function best(v: PublicView, candidates: AiMove[], standard: Decide, salt: strin
 
 /** Take or draw: Standard's cheapest ways to take the pile, against drawing. */
 export function expertStart(v: PublicView, takes: AiMove[], fallback: AiMove, standard: Decide): AiMove {
-  if (v.stockCount === 0 || !takes.length) return fallback;
+  if (!EXPERT_BUDGET.start || v.stockCount === 0 || !takes.length) return fallback;
   const cands: AiMove[] = [fallback, ...takes.filter((t) => JSON.stringify(t) !== JSON.stringify(fallback)).slice(0, 2)];
   if (fallback.t !== 'draw') cands.push({ t: 'draw' });
   return best(v, cands, standard, 'start') ?? fallback;
@@ -172,6 +172,7 @@ export function expertStart(v: PublicView, takes: AiMove[], fallback: AiMove, st
 
 /** Discard: one candidate per kind of card (rank, wild card, black three), Standard's choice first. */
 export function expertDiscard(v: PublicView, fallback: CardId, standard: Decide): AiMove {
+  if (!EXPERT_BUDGET.discard) return { t: 'discard', card: fallback };
   const kinds = new Map<string, CardId>();
   const key = (c: CardId) => (isWild(c) ? `w${pointValue(c)}` : isBlackThree(c) ? 'b3' : `n${rankOf(c)}`);
   kinds.set(key(fallback), fallback);

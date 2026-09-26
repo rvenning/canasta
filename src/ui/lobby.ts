@@ -14,7 +14,7 @@ import { h } from './dom.ts';
 export const LEVELS: [AiLevel, string, string][] = [
   ['relaxed', 'Relaxed', 'Melds what it can and takes easy piles. Good for learning.'],
   ['standard', 'Standard', 'Keeps pairs for frozen piles, completes canastas, discards with care.'],
-  ['expert', 'Expert', 'Remembers every card it has seen and judges each discard’s risk.'],
+  ['expert', 'Expert', 'The strongest: judges each take and discard more deeply.'],
 ];
 
 export function startMatch(ctx: AppCtx, players: PlayerCount, seats: SeatConfig[]) {

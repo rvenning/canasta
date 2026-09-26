@@ -11,12 +11,11 @@
  * - Standard: keeps pairs for taking frozen piles, completes canastas with wild
  *   cards, avoids discarding cards that let the next opponent add to a meld and
  *   take a live pile, uses black threes as stoppers, times going out.
- * - Expert: remembers every card it has seen (melds, discards, and the piles
- *   opponents picked up) and from that estimates, for each possible discard, the
- *   chance the next opponent can take the pile with it; weighs pile value against
- *   the cost of taking; freezes a big pile with a wild card; asks partner before
- *   going out. Its weights were tuned by self-play against Standard (tools/tune.ts,
- *   docs/AI_REPORT.md).
+ * - Expert: Standard's judgement plus look-ahead. With two or three players it
+ *   plays each candidate take-or-draw and discard forward in many sampled deals
+ *   consistent with everything it has seen (expert.ts); in four-player
+ *   partnerships it takes the pile far more readily and asks its partner before
+ *   going out. All weights were tuned by self-play (tools/tune.ts, docs/AI_REPORT.md).
  */
 import { isBlackThree, isNatural, isWild, pointValue, rankOf, sumPoints, type CardId, type Rank } from '../rules/cards.ts';
 import { CANASTA, MAX_WILDS, wildCount, type Meld } from '../rules/melds.ts';
@@ -26,7 +25,7 @@ import { goOutPlan } from '../engine/solver.ts';
 import { handStateFromView, type PublicView } from '../engine/view.ts';
 import type { AiLevel } from '../engine/match.ts';
 import { personaById, type Persona } from './personalities.ts';
-import { expertDiscard, expertStart } from './expert.ts';
+import { EXPERT_BUDGET, expertDiscard, expertStart } from './expert.ts';
 
 export type AiMove =
   | { t: 'draw' }
@@ -67,7 +66,19 @@ export interface Weights {
 export const WEIGHTS: Record<AiLevel, Weights> = {
   relaxed: { takeFactor: 0.4, wildTakeCost: 0, holdPairsUntil: 0, goOutPartnerCards: 99, goOutStock: 200, meldDanger: 0, pairDanger: 0, freezeAt: 99, blackThreeAt: 99, shedLate: 0, askAt: 99, noise: 10 },
   standard: { takeFactor: 2.5, wildTakeCost: 1.5, holdPairsUntil: 20, goOutPartnerCards: 5, goOutStock: 12, meldDanger: 1, pairDanger: 0, freezeAt: 99, blackThreeAt: 5, shedLate: 0.35, askAt: 99, noise: 0 },
-  expert: { takeFactor: 2.5, wildTakeCost: 1.5, holdPairsUntil: 20, goOutPartnerCards: 5, goOutStock: 12, meldDanger: 1, pairDanger: 1, freezeAt: 12, blackThreeAt: 5, shedLate: 0.35, askAt: 6, noise: 0 },
+  // Expert plays Standard's tuned heuristics and adds Monte Carlo look-ahead (expert.ts) for taking and discarding.
+  expert: { takeFactor: 2.5, wildTakeCost: 1.5, holdPairsUntil: 20, goOutPartnerCards: 5, goOutStock: 12, meldDanger: 1, pairDanger: 0, freezeAt: 99, blackThreeAt: 5, shedLate: 0.35, askAt: 6, noise: 0 },
+};
+
+/** Three players play differently (the pile decides who plays alone): Standard was tuned separately for it. */
+export const WEIGHTS_3P: Partial<Record<AiLevel, Weights>> = {
+  standard: { ...WEIGHTS.standard, meldDanger: 0, pairDanger: 2 },
+  expert: { ...WEIGHTS.expert, meldDanger: 0, pairDanger: 2 },
+};
+
+/** Four-player partnerships: Expert takes the pile far more readily (tuned by self-play against Standard). */
+export const WEIGHTS_4P: Partial<Record<AiLevel, Weights>> = {
+  expert: { ...WEIGHTS.expert, takeFactor: 0.6 },
 };
 
 interface Ctx { v: PublicView; hs: HandState; level: AiLevel; w: Weights; p: Persona; rng: Rng; melds: Meld[] }
@@ -83,10 +94,12 @@ function buckets(hand: readonly CardId[]) {
 }
 
 export function decide(v: PublicView, level: AiLevel, personaId?: string, weights?: Weights): AiMove {
-  const x: Ctx = { v, hs: handStateFromView(v), level, w: weights ?? WEIGHTS[level], p: personaById(personaId), rng: makeRng(hashSeed(v.matchSeed, v.handNo, v.log.length, v.seat, v.hand.length, 'ai')), melds: [] };
+  const x: Ctx = { v, hs: handStateFromView(v), level, w: weights ?? (v.rules.players === 3 ? WEIGHTS_3P[level] : v.rules.players === 4 ? WEIGHTS_4P[level] : undefined) ?? WEIGHTS[level], p: personaById(personaId), rng: makeRng(hashSeed(v.matchSeed, v.handNo, v.log.length, v.seat, v.hand.length, 'ai')), melds: [] };
   x.melds = sideMelds(v.rules, x.hs, v.seat);
   if (v.phase === 'ask') return { t: 'answer', yes: answerAsk(x) };
-  const monteCarlo = level === 'expert' && !weights;
+  // The look-ahead helps with two and three players; in four-player partnerships it measured slightly worse
+  // than Standard (docs/AI_REPORT.md), so there Expert plays its tuned partnership heuristics instead.
+  const monteCarlo = level === 'expert' && !weights && EXPERT_BUDGET.modes.includes(v.rules.players);
   const standard = (w: PublicView) => decide(w, 'standard');
   if (v.phase === 'draw') {
     const m = drawOrTake(x);
@@ -188,7 +201,7 @@ function playPhase(x: Ctx): AiMove {
   const plan = goOutPlan(v.hand, x.melds, v.rules.canastasToGoOut);
   if (plan && v.askAnswer !== 'no' && (v.askAnswer === 'yes' || wantsToGoOut(x))) {
     const partner = partnerOf(v.rules, x.hs, v.seat);
-    if (v.askAnswer === null && partner !== null && !v.asked && !v.meldedSinceDraw && v.handSizes[partner] >= x.w.askAt) return { t: 'ask' };
+    if (v.askAnswer === null && partner !== null && !v.asked && !v.meldedSinceDraw && v.hand.length >= 2 && v.handSizes[partner] >= x.w.askAt) return { t: 'ask' };
     if (plan.groups.length && legal(x, plan.groups, null).ok) return { t: 'meld', groups: plan.groups };
     if (plan.discard !== null && v.hand.length === 1) return { t: 'discard', card: plan.discard };
   }

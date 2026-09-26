@@ -748,7 +748,7 @@ export class GameScreen {
     out.push(B(this.selection.size === 1 ? `Discard ${cardShort([...this.selection][0])}` : 'Discard', 'discard', () => void this.discardAction(), { primary: this.selection.size === 1, disabled: this.selection.size !== 1 }));
     if (plan && hd.askAnswer !== 'no') out.push(B('Go out', 'go-out', () => this.goOutAction(), { primary: this.selection.size === 0 }));
     const partner = partnerOf(this.rules, hd, seat);
-    if (plan && partner !== null && !hd.asked && !hd.meldedSinceDraw) out.push(B('Ask partner', 'ask', () => this.askAction()));
+    if (plan && partner !== null && !hd.asked && !hd.meldedSinceDraw && hd.hands[seat].length >= 2) out.push(B('Ask partner', 'ask', () => this.askAction()));
     return out;
   }
 

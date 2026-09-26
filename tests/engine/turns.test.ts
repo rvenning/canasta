@@ -197,6 +197,9 @@ describe('going out', () => {
     expect(tryStep(yes, { t: 'discard', seat: 0, card: pick(yes.hand.hands[0], '4H')[0] })).toMatchObject({ ok: false, error: expect.stringMatching(/must go out/) });
     const no = step(step(sc().s, { t: 'ask', seat: 0 }), { t: 'answer', seat: 2, yes: false });
     expect(tryStep(no, { t: 'meld', seat: 0, groups: [{ rank: K, cards: pick(no.hand.hands[0], 'KH', 'KS', 'KD') }] })).toMatchObject({ ok: false, error: expect.stringMatching(/partner said no/) });
+    // Holding a single card, a “no” would leave no legal move, so asking is refused.
+    const { s: one } = scenario({ phase: 'play', melds: [{ slot: 0, owner: 2, rank: 9, cards: canasta('9') }], hands: [['KC'], ['4D'], ['4C', 'AS'], ['4S']] });
+    expect(tryStep(one, { t: 'ask', seat: 0 })).toMatchObject({ ok: false, error: expect.stringMatching(/one card/) });
     // Two players have nobody to ask.
     const { s: two } = scenario({ players: 2, phase: 'play', hands: [['KH', 'KS', 'KD', '4H'], ['4D']] });
     expect(tryStep(two, { t: 'ask', seat: 0 }).ok).toBe(false);

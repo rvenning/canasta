@@ -151,6 +151,8 @@ export function apply(s: MatchState, cmd: Command): Result {
       const partner = partnerOf(r, h, seat);
       if (partner === null) return err('You have no partner to ask.');
       if (h.asked || h.meldedSinceDraw) return err('You can only ask straight after drawing, before melding anything else.');
+      // A "no" must leave a legal turn (keep a card after discarding), so with one card there is nothing to ask.
+      if (h.hands[seat].length < 2) return err('With one card left you can only go out, so there is nothing to ask.');
       if (!goOutPlan(h.hands[seat], sideMelds(r, h, seat), r.canastasToGoOut)) return err('You cannot go out with these cards yet, so there is nothing to ask.');
       nh.phase = 'ask';
       nh.asked = true;

@@ -13,13 +13,13 @@ import type { AiLevel } from '../src/engine/match.ts';
 const N = Number(process.argv[2] ?? 100);
 const pairs: [AiLevel, AiLevel][] = [['standard', 'relaxed'], ['expert', 'relaxed'], ['expert', 'standard']];
 let illegal = 0, stalled = 0, msMax = 0, matches = 0, hands = 0;
-for (const players of [2, 3, 4] as const) {
+for (const players of (process.env.MODES ?? '2,3,4').split(',').map(Number) as (2 | 3 | 4)[]) {
   for (const [a, b] of pairs) {
     let wins = 0, n = 0;
     for (let seed = 1; seed <= N; seed++) {
       const swap = seed % 2 === 0;
       const lv: AiLevel[] = players === 4 ? (swap ? [b, a, b, a] : [a, b, a, b]) : players === 2 ? (swap ? [b, a] : [a, b]) : [[a, b, b], [b, a, b], [b, b, a]][seed % 3];
-      const r = simulateMatch(players, lv, 50000 + seed * 13 + players);
+      const r = simulateMatch(players, lv, 150000 + seed * 13 + players);
       matches++; hands += r.hands; illegal += r.illegal.length; stalled += r.stalled ? 1 : 0; msMax = Math.max(msMax, r.msMax);
       if (r.winner === null) continue;
       n++;

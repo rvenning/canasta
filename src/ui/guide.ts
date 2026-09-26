@@ -118,7 +118,7 @@ export function hint(s: MatchState, seat: number, o: { selection: readonly CardI
   const plan = goOutPlan(h.hands[seat], sideMelds(r, h, seat), r.canastasToGoOut);
   if (plan && h.askAnswer !== 'no') {
     const partner = partnerOf(r, h, seat);
-    return { text: `You can go out now${partner !== null && !h.asked && !h.meldedSinceDraw ? ' — or first ask your partner' : ''}.`, tone: 'good' };
+    return { text: `You can go out now${partner !== null && !h.asked && !h.meldedSinceDraw && h.hands[seat].length >= 2 ? ' — or first ask your partner' : ''}.`, tone: 'good' };
   }
   if (!opened) {
     const sug = openingSuggestion(h.hands[seat], need);
