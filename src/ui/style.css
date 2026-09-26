@@ -310,7 +310,6 @@ table.rt th, table.rt td { text-align: left; padding: 8px 6px; border-bottom: 1p
 .hand-row + .hand-row { margin-top: calc(var(--cw) * -0.8); }
 .hand .card { margin-left: calc(var(--hand-overlap) * -1); cursor: pointer; transition: transform calc(140ms * var(--anim)) var(--ease); border-radius: 8px; }
 .hand .card:first-child { margin-left: 0; }
-.hand .card.selected { z-index: 4; }
 .hand .card.selected { transform: translateY(-16px); }
 .hand .card.coach-card:not(.selected) img { box-shadow: 0 0 0 3px var(--river), 0 0 12px rgba(47, 120, 196, .8); }
 .hand .card.selected img { box-shadow: 0 0 0 3px var(--sun), 0 6px 14px rgba(0, 0, 0, .35); }
