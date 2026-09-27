@@ -1,12 +1,12 @@
 /**
  * Sound for the table: one place that decides what is heard, how loudly and where.
  *
- * - Card sounds and the candombe phrases are recordings played through Howler
+ * - Card sounds and short percussion cues are recordings played through Howler
  *   (recorded.ts, loaded after the first gesture). Until they have loaded, or if
  *   they cannot, a synthesised voice (synth.ts) plays a stand-in.
  * - Volume categories: card sounds and phrases follow "Effects volume", interface
- *   cues "Interface volume", the table rhythm "Rhythm volume". Turning effects off
- *   silences every cue; the rhythm has its own switch and is off by default.
+ *   cues "Interface volume", and the background track "Music volume". Turning
+ *   effects off silences every cue; music has its own switch and volume.
  * - Card sounds can sit a little left or right, following the seat that played.
  * - Sounds react to engine events only and never hold up play; every meaningful
  *   cue also has a caption for players who cannot hear it.
@@ -94,7 +94,7 @@ export class AudioDirector {
   private recordedReady() { return !!this.rec && this.rec.loaded; }
 
   private apply() {
-    // The rhythm exists only as a recording; the synthesised voice has no ambience.
+    // Background music exists only as a recording; the synthesised voice has none.
     this.synth.setVolumes({ sfx: this.volumeFor('cards'), ui: this.volumeFor('ui'), amb: 0 });
     if (this.recordedReady()) this.rec!.ambience(this.s.ambOn ? this.s.ambVolume * 0.7 : 0);
   }

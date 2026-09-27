@@ -17,7 +17,7 @@ export interface Settings {
   sfxOn: boolean;
   sfxVolume: number;
   uiVolume: number;
-  /** The quiet candombe rhythm under play. */
+  /** Optional mellow table music under play. */
   ambienceOn: boolean;
   ambienceVolume: number;
   captions: boolean;
@@ -45,7 +45,7 @@ export const DEFAULT_SETTINGS: Settings = {
   captions: false,
   cardBack: 'canasta',
   table: 'tejido',
-  tableView: 'auto',
+  tableView: '2d',
   aiSpeed: 1,
   sortWildsLast: true,
 };

@@ -103,8 +103,8 @@ export function settingsPanel(ctx: AppCtx): HTMLElement {
     toggle(ctx, 'sfxOn', 'Sound effects'),
     slider(ctx, 'sfxVolume', 'Effects volume'),
     slider(ctx, 'uiVolume', 'Interface volume'),
-    toggle(ctx, 'ambienceOn', 'Candombe rhythm', 'A quiet drum rhythm under play.'),
-    slider(ctx, 'ambienceVolume', 'Rhythm volume'),
+    toggle(ctx, 'ambienceOn', 'Table music', 'Green Salon, a mellow bossa nova by Yubatake.'),
+    slider(ctx, 'ambienceVolume', 'Music volume'),
     toggle(ctx, 'captions', 'Captions for sounds'));
 }
 
@@ -178,7 +178,11 @@ export function creditsScreen(ctx: AppCtx): Screen {
       item('Card faces', 'Adrian Kennard’s SVG playing cards (me.uk/cards), dedicated to the public domain (CC0), as packaged by letele/playing-cards. Enlarged corner indices, paper and four-colour variant added for this game.'),
       item('Jokers and card backs', 'Original artwork for this game: the “El Sol” comodín, and backs after a woven basket, the Río de la Plata stripes and Montevideo’s hydraulic floor tiles.'),
       item('Card sounds', 'Kenney, “Casino Audio” (kenney.nl), CC0.'),
-      item('Percussion', 'Sam Gossner, VSCO 2 Community Edition congas, claves and cowbell, and menegass, bongos — both CC0 via Freesound. Sequenced into candombe-style phrases for this game.'),
+      item('Short musical cues', 'Sam Gossner, VSCO 2 Community Edition congas, claves and cowbell, and menegass, bongos — both CC0 via Freesound.'),
+      h('li', {}, h('strong', {}, 'Table music'), ' — “Green Salon” by Yubatake. ',
+        h('a', { href: 'https://opengameart.org/content/green-salon', target: '_blank', rel: 'noopener noreferrer' }, 'Original track'),
+        ' · ', h('a', { href: 'https://creativecommons.org/licenses/by/4.0/', target: '_blank', rel: 'noopener noreferrer' }, 'CC BY 4.0 licence'),
+        '. Converted to MP3 for this game.'),
       item('Rules', 'Pagat.com (John McLeod), Classic Canasta, cross-checked with Bicycle’s guide.'),
       item('Software', 'three.js, Motion and Howler.js (MIT).')),
     h('p', { class: 'small muted' }, 'Full provenance, licences and modifications: docs/ASSETS.md in the source repository.')));

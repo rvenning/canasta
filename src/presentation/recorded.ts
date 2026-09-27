@@ -3,8 +3,7 @@
  * after the first user gesture, so it never delays the first screen.
  *
  * One audio sprite holds every short sound (webm/Opus with an MP3 fallback);
- * the candombe table rhythm is a separate seamless loop. Built by tools/build-audio.ts
- * from CC0 / public-domain recordings listed in docs/ASSETS.md.
+ * The optional table music is a separate licensed recording listed in docs/ASSETS.md.
  */
 import { Howl, Howler } from 'howler';
 import map from './soundSprite.json';
@@ -47,7 +46,7 @@ export function createRecorded(onReady: () => void, onError: (why: string) => vo
         if (amb && ambId !== null) { const a = amb, id = ambId; a.fade(a.volume(id) as number, 0, 600, id); a.once('fade', () => a.pause(id), id); }
         return;
       }
-      if (!amb) amb = new Howl({ src: [BASE + 'rhythm.webm', BASE + 'rhythm.mp3'], loop: true, volume: 0, preload: true });
+      if (!amb) amb = new Howl({ src: [BASE + 'green-salon.mp3'], loop: true, volume: 0, preload: true });
       if (ambId === null || !amb.playing(ambId)) { ambId = ambId !== null ? (amb.play(ambId), ambId) : amb.play(); amb.volume(0, ambId); }
       amb.fade(amb.volume(ambId) as number, Math.min(1, volume), 900, ambId);
     },

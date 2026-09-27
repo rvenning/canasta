@@ -24,11 +24,11 @@ three levels, or mix the two. Works offline once opened, and installs on a phone
   off, with a rules reference for each player count.
 - A colourful Río de la Plata table: a woven cloth (or Montevideo night, or a
   tiled patio), card backs after a woven basket, the river's stripes and
-  hydraulic floor tiles, and a sun-faced joker. A lamp-lit **3D table**
-  (three.js) paints under the ordinary table where the device can carry it;
+  hydraulic floor tiles, and a sun-faced joker. The crisp flat table is the
+  default; an optional lamp-lit **3D table** (three.js) is available in Settings.
   **Motion** springs the cards; **Howler.js** plays recorded card sounds and
-  short candombe phrases (congas and claves) for canastas and going out, plus an
-  optional quiet table rhythm.
+  short percussion phrases (congas and claves) for canastas and going out, plus
+  optional mellow bossa nova table music (“Green Salon” by Yubatake, CC BY 4.0).
 - Readable large card indices (the melds are fanned tightly), an optional
   four-colour deck, larger cards, keyboard play, screen-reader announcements,
   captions for sounds, reduced motion, separate volumes.
@@ -49,8 +49,8 @@ npm run build && npm run preview                          # http://localhost:813
 npm run e2e -- http://localhost:8138/ --only offline      # offline play from the service worker
 ```
 
-Asset tools: `npm run cards` (card faces and backs), `npm run audio` (sprite and
-rhythm loop), `npm run icons`. `node tools/tune.ts <level> <opponent>` searches
+Asset tools: `npm run cards` (card faces and backs), `npm run audio` (sound sprite),
+`npm run icons`. `node tools/tune.ts <level> <opponent>` searches
 AI weights by self-play.
 
 Pushing to `master` runs the tests and deploys `dist/` to GitHub Pages.

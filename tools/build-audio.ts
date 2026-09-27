@@ -1,12 +1,12 @@
 /**
- * Builds the recorded-sound sprite and the candombe rhythm loop for Howler.
+ * Builds the recorded-sound sprite for Howler.
  *
  *   node tools/build-audio.ts
  *
  * Card sounds: Kenney "Casino Audio" (CC0). Percussion: Sam Gossner's VSCO 2 Community
  * Edition congas, claves and cowbell, and menegass's bongos, all CC0 on Freesound (the
- * HQ previews, kept in art/source/audio/vsco/). The celebration phrases and the rhythm
- * loop are sequenced here from single hits, in the manner of Uruguayan candombe: the
+ * HQ previews, kept in art/source/audio/vsco/). Celebration phrases are
+ * sequenced here from single hits, in the manner of Uruguayan candombe: the
  * madera (stick) pattern on claves, the chico's offbeat taps and the piano drum's low
  * accents. See docs/ASSETS.md.
  */
@@ -174,26 +174,5 @@ const OUT = 'public/audio';
 mkdirSync(OUT, { recursive: true });
 encode(sprite, join(OUT, 'sprite'), { opusKbps: 64, mp3Kbps: 96 });
 
-// The table rhythm: four quiet bars of candombe, looping exactly on the bar line.
-const loopBars = 4, loopLen = loopBars * 16 * S16;
-const amb: { at: number; pcm: Pcm; gain?: number; pan?: number }[] = [];
-for (let b = 0; b < loopBars; b++) {
-  const from = b * 16 * S16;
-  [0, 3, 6, 10, 12].forEach((s, i) => amb.push({ at: from + s * S16, pcm: pickHit(HITS.clave, i + b), gain: 0.35, pan: -0.4 }));
-  for (let beat = 0; beat < 4; beat++) {
-    amb.push({ at: from + (beat * 4 + 1) * S16, pcm: pickHit(HITS.tap, beat), gain: 0.3, pan: 0.4 });
-    amb.push({ at: from + (beat * 4 + 2) * S16, pcm: pickHit(HITS.congaSoft, beat + b), gain: 0.45, pan: 0.4 });
-  }
-  amb.push({ at: from, pcm: HITS.bongo[2], gain: 0.5 });
-  amb.push({ at: from + 10 * S16, pcm: HITS.bongo[b % 2], gain: 0.4 });
-}
-const raw = sequence(amb, 0.8);
-// Fold the tail past the loop point back onto the start, so it repeats seamlessly.
-const L = Math.round(loopLen * RATE);
-const folded: Pcm = { l: raw.l.slice(0, L), r: raw.r.slice(0, L) };
-for (let i = L; i < raw.l.length; i++) { folded.l[i - L] += raw.l[i]; folded.r[i - L] += raw.r[i]; }
-const ambience = level(folded, -30);
-encode(ambience, join(OUT, 'rhythm'), { opusKbps: 48, mp3Kbps: 64 });
-
-writeFileSync('src/presentation/soundSprite.json', JSON.stringify({ sprite: map, rhythmMs: Math.round((ambience.l.length / RATE) * 1000) }, null, 1) + '\n');
-console.log(`sprite: ${clips.length} clips, ${(at / RATE).toFixed(1)} s; rhythm loop ${(ambience.l.length / RATE).toFixed(2)} s`);
+writeFileSync('src/presentation/soundSprite.json', JSON.stringify({ sprite: map }, null, 1) + '\n');
+console.log(`sprite: ${clips.length} clips, ${(at / RATE).toFixed(1)} s`);

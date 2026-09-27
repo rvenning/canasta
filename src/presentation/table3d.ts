@@ -42,7 +42,7 @@ function clothCanvas(s: Surface): HTMLCanvasElement {
   const c = document.createElement('canvas');
   c.width = c.height = 256;
   const g = c.getContext('2d')!;
-  const pal = { tejido: ['#9c3b25', '#b24a2c', '#7d2b19', '#e9a441'], noche: ['#262b5c', '#2e3570', '#1a1e44', '#8fa0e0'], patio: ['#1f5f63', '#256d70', '#174a4d', '#f2e6cc'] }[s];
+  const pal = { tejido: ['#19504a', '#25675c', '#123a38', '#e9b976'], noche: ['#273b55', '#354d69', '#17283d', '#a9bad1'], patio: ['#246653', '#377f63', '#184739', '#f2e6cc'] }[s];
   g.fillStyle = pal[0];
   g.fillRect(0, 0, 256, 256);
   if (s === 'patio') {
@@ -131,8 +131,8 @@ export class Table3D {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); this.fail('the graphics context was lost'); });
 
-    this.scene.background = new THREE.Color(0x2a0f0a);
-    this.scene.add(new THREE.HemisphereLight(0xfff4e6, 0x3a1810, 1.15));
+    this.scene.background = new THREE.Color(0x142c2d);
+    this.scene.add(new THREE.HemisphereLight(0xfff4e6, 0x173a37, 1.15));
     this.lamp = new THREE.SpotLight(0xffe0b0, 3.0, 0, THREE.MathUtils.degToRad(48), 0.85, 0);
     this.lamp.castShadow = true;
     const small = Math.min(innerWidth, innerHeight) < 600;

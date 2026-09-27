@@ -593,12 +593,14 @@ export class GameScreen {
     const canDraw = myMove && hd.phase === 'draw';
     const stock = h('button', { class: 'stock' + (canDraw ? ' live' : ''), 'data-action': 'draw', 'aria-label': `Stock, ${hd.stock.length} cards${canDraw ? '. Draw' : ''}`, disabled: !canDraw, onclick: () => this.drawAction() },
       hd.stock.length ? backEl('stock-card', hd.stock[hd.stock.length - 1]) : h('div', { class: 'card empty-slot' }),
-      h('span', { class: 'count' }, String(hd.stock.length)));
+      h('span', { class: 'count' }, String(hd.stock.length)),
+      h('span', { class: 'stack-name', 'aria-hidden': 'true' }, 'Draw'));
     const stopped = pileTopCard !== null && isBlackThree(pileTopCard);
     const pile = h('button', { class: 'pile' + (canDraw && pileTopCard !== null ? ' live' : '') + (hd.pileFrozen ? ' frozen' : '') + (this.taking ? ' taking' : ''), 'data-action': 'take', disabled: !(canDraw && pileTopCard !== null), 'aria-label': `Discard pile, ${hd.pile.length} cards${pileTopCard !== null ? `, ${cardName(pileTopCard)} on top` : ''}${hd.pileFrozen ? ', frozen' : ''}`, onclick: () => this.takeAction() },
       frozenBy !== null && frozenBy !== pileTopCard ? cardEl(frozenBy, 'crosswise') : null,
       pileTopCard !== null ? cardEl(pileTopCard, 'pile-top') : h('div', { class: 'card empty-slot' }),
-      h('span', { class: 'count' }, String(hd.pile.length)));
+      h('span', { class: 'count' }, String(hd.pile.length)),
+      h('span', { class: 'stack-name', 'aria-hidden': 'true' }, 'Discard'));
     const status = h('div', { class: 'status' },
       h('div', { class: 'turn-line' }, s.phase === 'play' ? (myMove ? (hd.phase === 'ask' ? 'Your answer' : 'Your turn') : `${seatName(s, actorSeat)}${this.isHuman(actorSeat) ? '’s turn' : ' is playing'}`) : 'Hand over'),
       (hd.pileFrozen || stopped) ? h('div', { class: 'pile-state' },
@@ -706,7 +708,7 @@ export class GameScreen {
       });
     const rows: HTMLElement[] = [];
     for (let i = 0; i < els.length; i += geo.perRow) rows.push(h('div', { class: 'hand-row' }, els.slice(i, i + geo.perRow)));
-    return h('div', { class: 'hand' + (live ? ' live' : '') + (rows.length > 1 ? ' rows' : ''), role: 'listbox', 'aria-multiselectable': 'true', 'aria-label': `Your hand, ${hand.length} cards` }, rows);
+    return h('div', { class: 'hand' + (live ? ' live' : '') + (rows.length > 1 ? ' rows' : ''), role: 'listbox', 'aria-multiselectable': 'true', 'aria-label': `Your hand, ${hand.length} cards`, 'data-label': `${seatName(s, seat)} · ${hand.length} cards` }, rows);
   }
 
   private actionButtons(): HTMLElement[] {
