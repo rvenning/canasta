@@ -491,7 +491,15 @@ export class GameScreen {
    */
   private geometry(n: number) {
     const r = this.el.getBoundingClientRect();
-    const W = Math.max(200, r.width - 24), H = Math.max(300, r.height);
+    // The table is capped at 1200px even when the browser is much wider. Measure
+    // the hand itself when it exists; otherwise allow for the table and hand
+    // padding on the first render. The fan must fit inside this space.
+    const hand = this.el.querySelector<HTMLElement>('.hand');
+    const pad = hand ? getComputedStyle(hand) : null;
+    const W = Math.max(200, hand
+      ? hand.clientWidth - parseFloat(pad!.paddingLeft) - parseFloat(pad!.paddingRight) - 2
+      : Math.min(r.width, 1200) - (r.width <= 850 || r.height <= 620 ? 24 : 64));
+    const H = Math.max(300, r.height);
     const large = this.ctx.settings.largeCards ? 1.15 : 1;
     const cwMax = Math.min(96, Math.max(48, Math.min(W / 6.2, H / 9.5))) * large;
     const STRIP = 0.34;

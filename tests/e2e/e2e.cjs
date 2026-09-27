@@ -282,10 +282,10 @@ const scenarios = {
   },
 
   async deviceMatrix(d) {
-    const sizes = [['iphone-se', 320, 568], ['iphone-15', 393, 852], ['iphone-land', 852, 393], ['pixel-7', 412, 915], ['ipad-port', 820, 1180], ['ipad-land', 1180, 820], ['laptop', 1366, 768], ['desktop', 1680, 1050]];
+    const sizes = [['iphone-se', 320, 568], ['iphone-15', 393, 852], ['iphone-land', 852, 393], ['pixel-7', 412, 915], ['ipad-port', 820, 1180], ['ipad-land', 1180, 820], ['laptop', 1366, 768], ['desktop', 1680, 1050], ['wide-desktop', 2560, 1392], ['wide-desktop-2p', 2560, 1392]];
     for (const [name, w, h] of sizes) {
       await d.resize(w, h, 2);
-      await prime(d, { fixture: FIX.nearEnd4 });
+      await prime(d, { fixture: name === 'wide-desktop-2p' ? FIX.nearEnd2 : FIX.nearEnd4 });
       await d.tapText('Continue match');
       await d.waitFor(() => !!document.querySelector('.actions [data-action="draw"]:not(:disabled)'), 20000);
       await d.tap('.actions [data-action="draw"]');
@@ -294,10 +294,12 @@ const scenarios = {
         const vw = innerWidth, vh = innerHeight;
         const inside = (e) => { const r = e.getBoundingClientRect(); return r.left >= -1 && r.right <= vw + 1 && r.top >= -1 && r.bottom <= vh + 1; };
         const hand = [...document.querySelectorAll('.hand .card')];
+        const handBox = document.querySelector('.hand').getBoundingClientRect();
+        const inHand = hand.every((e) => { const r = e.getBoundingClientRect(); return r.left >= handBox.left - 1 && r.right <= handBox.right + 1; });
         const btns = [...document.querySelectorAll('.actions .btn')];
-        return { overflow: document.documentElement.scrollWidth > vw + 1, hand: hand.every(inside), btns: btns.every(inside) && btns.every((b) => b.getBoundingClientRect().height >= 40), pile: inside(document.querySelector('.pile')), stock: inside(document.querySelector('.stock')), cw: getComputedStyle(document.querySelector('.hand .card')).width };
+        return { overflow: document.documentElement.scrollWidth > vw + 1, hand: hand.every(inside), inHand, btns: btns.every(inside) && btns.every((b) => b.getBoundingClientRect().height >= 40), pile: inside(document.querySelector('.pile')), stock: inside(document.querySelector('.stock')), cw: getComputedStyle(document.querySelector('.hand .card')).width };
       });
-      d.ok(`${name}: no sideways scroll, hand, buttons, stock and pile on screen`, !m.overflow && m.hand && m.btns && m.pile && m.stock, JSON.stringify(m));
+      d.ok(`${name}: hand inside table, no sideways scroll, controls on screen`, !m.overflow && m.hand && m.inHand && m.btns && m.pile && m.stock, JSON.stringify(m));
       await d.shot(`60-${name}`);
     }
   },
