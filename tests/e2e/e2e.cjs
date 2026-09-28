@@ -303,6 +303,29 @@ const scenarios = {
       await d.shot(`60-${name}`);
     }
   },
+
+  async wideMeldLayout(d) {
+    const fixture = JSON.parse(JSON.stringify(FIX.nearEnd2));
+    const cardsOfRank = (rank, count) => Array.from({ length: 108 }, (_, id) => id)
+      .filter((id) => id % 54 < 52 && (id % 54) % 13 + 1 === rank).slice(0, count);
+    fixture.state.hand.melds[1] = [
+      { id: 901, rank: 8, cards: cardsOfRank(8, 7), owner: 1, slot: 1 },
+      { id: 902, rank: 11, cards: cardsOfRank(11, 4), owner: 1, slot: 1 },
+      { id: 903, rank: 12, cards: cardsOfRank(12, 3), owner: 1, slot: 1 },
+    ];
+    for (const [width, height] of [[1680, 1050], [1920, 1080], [2560, 1392]]) {
+      await d.resize(width, height, 2);
+      await prime(d, { fixture });
+      await d.tapText('Continue match');
+      const m = await d.js(() => {
+        const table = document.querySelector('.table-grid').getBoundingClientRect();
+        const zone = document.querySelector('.zone.them');
+        return { tableWidth: table.width, tableHeight: table.height, meldCount: zone.querySelectorAll('.meld').length, scroll: zone.scrollHeight - zone.clientHeight };
+      });
+      d.ok(`${width}x${height}: three melds fit without scrolling`, m.tableWidth >= Math.min(width - 32, 1800) - 1 && m.tableHeight >= Math.min(height - 32, 1220) - 1 && m.meldCount === 3 && m.scroll <= 1, JSON.stringify(m));
+      await d.shot(`61-wide-melds-${width}`);
+    }
+  },
 };
 
 (async () => {

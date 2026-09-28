@@ -448,9 +448,9 @@ table.rt th, table.rt td { text-align: left; padding: 8px 6px; border-bottom: 1p
   opacity: .8;
 }
 .table-grid {
-  width: min(100%, 1200px);
-  max-width: 1200px;
-  height: min(100dvh - 32px, 960px);
+  width: min(calc(100% - 32px), 1800px);
+  max-width: 1800px;
+  height: min(100dvh - 32px, 1220px);
   inset: 50% auto auto 50%;
   transform: translate(-50%, -50%);
   padding: 14px 18px 12px;
@@ -502,6 +502,7 @@ table.rt th, table.rt td { text-align: left; padding: 8px 6px; border-bottom: 1p
 .zone { gap: 8px; }
 .zone.them { flex-direction: row; align-items: stretch; }
 .zone.them > .side { flex: 1; }
+.zone.us > .side { flex: 1; }
 .side {
   min-height: 0;
   background: rgba(9, 42, 38, .47);

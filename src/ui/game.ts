@@ -491,17 +491,21 @@ export class GameScreen {
    */
   private geometry(n: number) {
     const r = this.el.getBoundingClientRect();
-    // The table is capped at 1200px even when the browser is much wider. Measure
+    // The table has its own maximum width even when the browser is wider. Measure
     // the hand itself when it exists; otherwise allow for the table and hand
     // padding on the first render. The fan must fit inside this space.
     const hand = this.el.querySelector<HTMLElement>('.hand');
+    const table = this.el.querySelector<HTMLElement>('.table-grid');
     const pad = hand ? getComputedStyle(hand) : null;
     const W = Math.max(200, hand
       ? hand.clientWidth - parseFloat(pad!.paddingLeft) - parseFloat(pad!.paddingRight) - 2
-      : Math.min(r.width, 1200) - (r.width <= 850 || r.height <= 620 ? 24 : 64));
-    const H = Math.max(300, r.height);
+      : r.width <= 850 || r.height <= 620
+        ? r.width - 24
+        : Math.min(r.width - 32, 1800) - 64);
+    const H = Math.max(300, table?.clientHeight ?? (r.width <= 850 || r.height <= 620 ? r.height : Math.min(r.height - 32, 1220)));
     const large = this.ctx.settings.largeCards ? 1.15 : 1;
-    const cwMax = Math.min(96, Math.max(48, Math.min(W / 6.2, H / 9.5))) * large;
+    const roomy = W > 1400 && H > 1000;
+    const cwMax = Math.min(roomy ? 112 : 96, Math.max(48, Math.min(W / 6.2, H / 9.5))) * large;
     const STRIP = 0.34;
     let rows = 1, cw = cwMax, perRow = Math.max(1, n);
     for (rows = 1; rows <= 3; rows++) {
@@ -511,7 +515,7 @@ export class GameScreen {
     }
     rows = Math.min(rows, 3);
     const overlap = perRow <= 1 ? 0 : Math.min(cw * (1 - STRIP), Math.max(0, cw - (W - cw) / (perRow - 1)));
-    const meldW = Math.min(W > 900 && H > 700 ? 84 : 64, Math.max(34, Math.min(W / 11, H / (W > 900 ? 12 : 15)))) * large;
+    const meldW = Math.min(roomy ? 100 : W > 900 && H > 700 ? 84 : 64, Math.max(34, Math.min(W / 11, H / (W > 900 ? 12 : 15)))) * large;
     return { cw, rows, perRow, overlap, meldW };
   }
 

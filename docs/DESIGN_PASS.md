@@ -28,8 +28,10 @@ The wide desktop layout spread the game into a left meld column and distant
 right-hand controls, leaving a large unused centre. The new layout forms one
 bounded table: opponents above, stock and discard in the middle, the player's
 melds below, then guidance, actions, and hand. The desktop board is capped at
-1200 × 960 CSS pixels. Phone and short landscape layouts use the whole screen
-and let meld zones scroll.
+1800 × 1220 CSS pixels on roomy displays. Phone and short landscape layouts use
+the whole screen and let meld zones scroll. On large screens the player and
+opponent meld panels fill their table rows, keeping several melds visible without
+scrollbars.
 
 The default uses the crisp flat table because it keeps card faces maximally
 legible. Three.js remains an optional table setting, with its cloth palette
